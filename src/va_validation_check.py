@@ -14,20 +14,21 @@ return_rate  - portion of mail-in ballots returned | accept_all / request_all
 
 import pandas as pd
 
-csv_url = 'https://election.lab.ufl.edu/data-downloads/earlyvote/2026/VA_county.csv'
+CSV_URL = 'https://election.lab.ufl.edu/data-downloads/earlyvote/2026/VA_county.csv'
 
-df = pd.read_csv(csv_url)
+df = pd.read_csv(CSV_URL)
 
 # the following code conducts validation testing on the new csv file to ensure
 # data quality and accuracy
 
-# initalizes validation_results dictionary
+# initializes validation_results dictionary
 validation_results = {}
 
 # checks that all expected columns are inside dataframe
 
 expected_columns = [
-    'county', 'cd', 'sdl', 'sdu', 'request_all', 'accept_all', 'inperson_all', 'voted_all', 'return_rate'
+    'county', 'cd', 'sdl', 'sdu', 'request_all', 'accept_all', 'inperson_all', 'voted_all',
+    'return_rate'
 ]
 
 columns_result = all(
@@ -36,7 +37,7 @@ columns_result = all(
 
 validation_results['expected_columns_test'] = columns_result
 
-# checks that all counties only have one row
+# checks that all localities only have one row
 
 unique_localities_test = df['county'].duplicated().any()
 
@@ -47,7 +48,7 @@ validation_results['unique_localities_test'] = unique_localities_result
 # checks that length of csv to confirm all localities are present
 # Virginia contains 133 counties and county-level equivalents
 
-complete_localities_result = (len(df) == 133)
+complete_localities_result = len(df) == 133
 
 validation_results['complete_localities_test'] = complete_localities_result
 
@@ -66,7 +67,7 @@ nonnegative_result = (df[numerical_columns] >= 0).all().all()
 validation_results['nonnegative_test'] = nonnegative_result
 
 # checks that voted_all = accept_all + inperson_all
-voted_all_test = (df['voted_all'] == df['accept_all'] + df['inperson_all'])
+voted_all_test = df['voted_all'] == df['accept_all'] + df['inperson_all']
 
 voted_all_result = voted_all_test.all()
 
@@ -80,7 +81,7 @@ numeric_return_rate = (df['return_rate'].str.replace(
 ).astype(float) / 100).round(4)
 
 return_rate_test = (
-    numeric_return_rate 
+    numeric_return_rate
     == (df['accept_all'] / df['request_all']).round(4)
 )
 
@@ -95,7 +96,7 @@ final_validation_check = all(validation_results.values())
 failed_tests = [test_name for test_name, result in validation_results.items()
                 if not result]
 
-if final_validation_check == True:
+if final_validation_check is True:
     print(True)
 else:
     print("Validation Test Failed.")
