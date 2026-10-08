@@ -8,7 +8,7 @@ sdu          - Virginia Senate district of locality
 request_all  - number of mail-in ballots requested
 accept_all   - number of accepted mail-in ballots
 inperson_all - number of in-person ballots cast
-voted_all    - total early votes cast | accept_all + ineprson_all
+voted_all    - total early votes cast | accept_all + inperson_all
 return_rate  - portion of mail-in ballots returned | accept_all / request_all
 """
 
@@ -65,12 +65,12 @@ nonnegative_result = (df[numerical_columns] >= 0).all().all()
 
 validation_results['nonnegative_test'] = nonnegative_result
 
-# checks that votes_all = accept_all + inperson_all
-votes_all_test = (df['voted_all'] == df['accept_all'] + df['inperson_all'])
+# checks that voted_all = accept_all + inperson_all
+voted_all_test = (df['voted_all'] == df['accept_all'] + df['inperson_all'])
 
-votes_all_result = votes_all_test.all()
+voted_all_result = voted_all_test.all()
 
-validation_results['votes_all_test'] = votes_all_result
+validation_results['voted_all_test'] = voted_all_result
 
 # checks that return_rate reflects the true returned ratio
 
@@ -89,5 +89,15 @@ return_rate_result = return_rate_test.all()
 validation_results['return_rate_test'] = return_rate_result
 
 # checks whether all validation tests passed
-
 final_validation_check = all(validation_results.values())
+
+# selects the names of any tests that failed
+failed_tests = [test_name for test_name, result in validation_results.items()
+                if not result]
+
+if final_validation_check == True:
+    print(True)
+else:
+    print("Validation Test Failed.")
+    print("The following tests failed:")
+    print(failed_tests)
